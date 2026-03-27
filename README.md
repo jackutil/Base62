@@ -6,4 +6,6 @@ This implementation is specifically designed for maximum throughput and minimal 
 
 ## Usage
 
-This utility is a single, dependency-free Java class. **The best practice for using this library is to simply copy and paste the `Base62.java` source code directly into your project.** 
+This utility is a single, dependency-free Java class. 
+
+**The best practice for using this library is to simply copy and paste the `Base62.java` source code directly into your project.** 
