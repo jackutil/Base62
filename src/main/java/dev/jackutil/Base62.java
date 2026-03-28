@@ -104,7 +104,7 @@ public final class Base62 {
 
     /**
      * Encodes an array of non-negative base-10 long integer into a Base62 string.
-     * Use this method for larger numbers of requests for improved memory efficiency.
+     * Use this method for larger numbers of items for improved memory efficiency.
      * @param number The non-negative long integer array to encode.
      * @return An array of the Base62 encoded string representations of the given numbers in the same order.
      * @throws IllegalArgumentException If one of the provided numbers is negative.
