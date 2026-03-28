@@ -15,8 +15,6 @@
  */
 package dev.jackutil;
 
-import java.util.Arrays;
-
 /**
  * An optimized utility class for encoding and decoding base-10 integers
  * to and from Base62 strings.
@@ -30,7 +28,9 @@ public final class Base62 {
 
     // Lookup-Table initialization for ASCII characters
     static {
-        Arrays.fill(DECODE_TABLE, -1);
+        for (int i = 0; i < ALPHABET.length(); i++) {
+            DECODE_TABLE[i] = -1;
+        }
 
         for (int i = 0; i < ALPHABET.length(); i++) {
             DECODE_TABLE[ALPHABET.charAt(i)] = i;
@@ -43,7 +43,7 @@ public final class Base62 {
      * @return A Base62 encoded string representation of the given number.
      * @throws IllegalArgumentException If the provided number is negative.
      */
-    public static String encode(final long number) {
+    public static String encode(final long number) throws IllegalArgumentException {
         if (number < 0) {
             throw new IllegalArgumentException("Number can not be negative");
         }
@@ -76,7 +76,7 @@ public final class Base62 {
      * @throws IllegalArgumentException If the input string is null, empty, or
      * contains invalid Base62 characters.
      */
-    public static long decode(final String input) {
+    public static long decode(final String input) throws IllegalArgumentException {
         if (input == null || input.isEmpty()) {
             throw new IllegalArgumentException("Input can not be null or empty");
         }
@@ -100,5 +100,50 @@ public final class Base62 {
         }
 
         return result;
+    }
+
+    /**
+     * Encodes an array of non-negative base-10 long integer into a Base62 string.
+     * Use this method for larger numbers of requests for improved memory efficiency.
+     * @param number The non-negative long integer array to encode.
+     * @return An array of the Base62 encoded string representations of the given numbers in the same order.
+     * @throws IllegalArgumentException If one of the provided numbers is negative.
+     */
+    public static String[] encodeArray(final long[] numbers) throws IllegalArgumentException {
+
+        int numSize = numbers.length;
+
+        char[] buf = new char[BUFFER_SIZE];
+
+        int index;
+
+        String[] encodedNumbers = new String[numSize];
+
+        for(int i = 0; i < numSize; i++) {
+            if (numbers[i] < 0) {
+                throw new IllegalArgumentException("Number can not be negative: " + numbers[i] + " - index [" + i + "]");
+            }
+
+            if (numbers[i] == 0) {
+                encodedNumbers[i] = "0";
+                continue;
+            }
+
+            long num = numbers[i];
+
+            index = BUFFER_SIZE;
+
+            while (num > 0) {
+                int remainder = (int) (num % BASE);
+
+                buf[--index] = ALPHABET.charAt(remainder);
+
+                num /= BASE;
+            }
+
+            encodedNumbers[i] = new String(buf, index, BUFFER_SIZE - index);
+        }
+
+        return encodedNumbers;
     }
 }

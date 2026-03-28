@@ -126,4 +126,53 @@ class Base62Test {
             assertEquals(originalValue, decoded, "Failed on value: " + originalValue);
         }
     }
+
+    // ==========================================
+    // ENCODE ARRAY TESTS
+    // ==========================================
+
+    @Test
+    void testEncodeArray_EmptyArray() {
+        long[] input = new long[0];
+        String[] result = Base62.encodeArray(input);
+        assertArrayEquals(new String[0], result, "Encoding an empty array should return an empty string array");
+    }
+
+    @Test
+    void testEncodeArray_MixedValues() {
+        long[] input = {0L, 1L, 62L, 999_999_999L, Long.MAX_VALUE};
+        String[] expected = {"0", "1", "10", "15FTGf", "aZl8N0y58M7"};
+        
+        String[] result = Base62.encodeArray(input);
+        
+        assertArrayEquals(expected, result);
+    }
+
+    @Test
+    void testEncodeArray_NegativeNumberThrowsException() {
+        // Place the negative number at index 2 to verify the error message captures the correct index
+        long[] input = {10L, 20L, -5L, 30L};
+        
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> Base62.encodeArray(input)
+        );
+        
+        assertEquals("Number can not be negative: -5 - index [2]", exception.getMessage());
+    }
+
+    @Test
+    void testSymmetry_EncodeArrayThenDecode() {
+        long[] originalValues = {
+                0L, 1L, 61L, 62L, 100L, 123456789L, 999999999999L, Long.MAX_VALUE
+        };
+
+        String[] encodedArray = Base62.encodeArray(originalValues);
+
+        // Decode each string in the resulting array and compare it back to the original value
+        for (int i = 0; i < encodedArray.length; i++) {
+            long decoded = Base62.decode(encodedArray[i]);
+            assertEquals(originalValues[i], decoded, "Failed on array index: " + i);
+        }
+    }
 }
